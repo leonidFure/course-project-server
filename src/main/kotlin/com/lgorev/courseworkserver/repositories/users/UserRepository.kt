@@ -4,7 +4,7 @@ import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface UserRepository: PagingAndSortingRepository<UserEntity, Long> {
+interface UserRepository: PagingAndSortingRepository<UserEntity, Long>, UserUpdateRepository {
     fun findByMail(mail: String): UserEntity?
     fun findByPhoneNumber(phoneNumber: String): UserEntity?
 }

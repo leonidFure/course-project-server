@@ -1,5 +1,6 @@
 package com.lgorev.courseworkserver.services
 
+import com.lgorev.courseworkserver.domain.ChangePasswordModel
 import com.lgorev.courseworkserver.domain.UserModel
 import com.lgorev.courseworkserver.exceptions.NotFoundException
 import com.lgorev.courseworkserver.exceptions.UniqueConstrainException
@@ -10,10 +11,10 @@ import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
-import javax.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 
 @Service
-@Transactional(rollbackOn = [UniqueConstrainException::class, NotFoundException::class])
+@Transactional(rollbackFor = [UniqueConstrainException::class, NotFoundException::class])
 class UserService(private val userRepository: UserRepository) {
 
     private val log = LoggerFactory.getLogger(UserService::class.java)
@@ -51,7 +52,7 @@ class UserService(private val userRepository: UserRepository) {
             throw UniqueConstrainException("User with phone number: ${userModel.phoneNumber} already exists")
         }
         log.info("User successfully updated")
-        return userRepository.save(userModel.toEntity())
+        return userRepository.update(userModel.toEntity())
     }
 
     fun delete(id: Long) {
@@ -71,6 +72,12 @@ class UserService(private val userRepository: UserRepository) {
     fun findPage(pageable: Pageable): Page<UserEntity> {
         return userRepository.findAll(pageable)
     }
+
+    fun changePassword(model: ChangePasswordModel) {
+        return userRepository.changePassword(model.id, model.oldPassword, model.newPassword)
+    }
+
+
 
     fun UserEntity.toModel(): UserModel {
         return UserModel(id, firstName, lastName, patronymic, birthDate, mail, phoneNumber, gender, password)

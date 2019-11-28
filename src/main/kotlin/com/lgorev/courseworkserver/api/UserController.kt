@@ -1,5 +1,6 @@
 package com.lgorev.courseworkserver.api
 
+import com.lgorev.courseworkserver.domain.ChangePasswordModel
 import com.lgorev.courseworkserver.domain.UserModel
 import com.lgorev.courseworkserver.services.UserService
 import org.springframework.data.domain.PageRequest
@@ -28,4 +29,8 @@ class UserController(private val userService: UserService) {
     fun getPage(@RequestParam("page") page: Int, @RequestParam("size") size: Int)
             = ResponseEntity.ok(userService.findPage(PageRequest.of(page, size)))
 
+    @PutMapping("change-password")
+    fun changePassword(@RequestBody changePasswordModel: ChangePasswordModel): ResponseEntity<*> {
+        return ResponseEntity.ok(userService.changePassword(changePasswordModel))
+    }
 }
