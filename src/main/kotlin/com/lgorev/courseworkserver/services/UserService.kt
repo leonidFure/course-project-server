@@ -51,8 +51,22 @@ class UserService(private val userRepository: UserRepository) {
             log.warn("User with phone number: ${userModel.phoneNumber} already exists")
             throw UniqueConstrainException("User with phone number: ${userModel.phoneNumber} already exists")
         }
+
+        val user = userRepository.findById(userModel.id).orElseThrow {
+            log.warn("User with id: ${userModel.id} not found")
+            throw NotFoundException("User with id: ${userModel.id} not found")
+        }.also {
+            it.firstName = userModel.firstName
+            it.lastName = userModel.lastName
+            it.patronymic = userModel.patronymic
+            it.birthDate = userModel.birthDate
+            it.phoneNumber = userModel.phoneNumber
+            it.mail = userModel.mail
+            it.gender = userModel.gender
+        }
+
         log.info("User successfully updated")
-        return userRepository.update(userModel.toEntity())
+        return user
     }
 
     fun delete(id: Long) {
@@ -76,8 +90,6 @@ class UserService(private val userRepository: UserRepository) {
     fun changePassword(model: ChangePasswordModel) {
         return userRepository.changePassword(model.id, model.oldPassword, model.newPassword)
     }
-
-
 
     fun UserEntity.toModel(): UserModel {
         return UserModel(id, firstName, lastName, patronymic, birthDate, mail, phoneNumber, gender, password)
